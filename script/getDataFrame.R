@@ -1,18 +1,22 @@
-############
-# DM Proj1 #
-############
+####################
+# DM Proj1         #
+# 1.1 getDataFrame #
+####################
 library(XML)
 library(plyr)
-originalpath <- getwd()
-docpath <- "../nyt_corpus/samples_500"
 
 # 1.1 Construct data.frame
-setwd(docpath)
-files <- list.files()
+getDataFrame <- function() {
+    docpath <- "../nyt_corpus/samples_500"
+    setwd(docpath)
+    files <- list.files()
+    Data <- ldply(files, parse_xml)
+}
+
 parse_xml <-function(FileName) {
     doc1 <- xmlParse(FileName)
 
-    # (1) Find full_text
+    # (1) Find Full_text
     textnodes <- getNodeSet(doc1,"//block[@class='full_text']/p")
     # Excluding the Leading paragraph
     text <- paste(llply(textnodes[-1], xmlValue), collapse="")
@@ -42,4 +46,3 @@ parse_xml <-function(FileName) {
     doc[["Body"]] <- llply(doc[["Body"]], as.character)
     return(doc)
 }
-Data <- ldply(files, parse_xml)
