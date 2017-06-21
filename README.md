@@ -7,4 +7,6 @@
 - tm
 - SnowballC
 - plyr
+- wordcloud
+
 
