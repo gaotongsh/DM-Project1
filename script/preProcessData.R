@@ -1,16 +1,20 @@
-####################
-# DM Proj1         #
-# 1.1 getDataFrame #
-####################
+###########################################
+# DM Proj1                                #
+# 1.1 1.2 Preprocess Data into Data.frame #
+###########################################
 library(XML)
 library(plyr)
+library(tm)
 
 # 1.1 Construct data.frame
 getDataFrame <- function() {
+    curpath <- getwd()
     docpath <- "../nyt_corpus/samples_500"
     setwd(docpath)
     files <- list.files()
     Data <- ldply(files, parse_xml)
+    setwd(curpath)
+    return(Data)
 }
 
 parse_xml <-function(FileName) {
@@ -45,4 +49,20 @@ parse_xml <-function(FileName) {
     doc[["Classifier"]] <- classes
     doc[["Body"]] <- llply(doc[["Body"]], as.character)
     return(doc)
+}
+
+# 1.2 Preprocess with tm
+getPreprocessedData <- function() {
+    data <- getDataFrame()
+    # To corpus
+    corpus <- Corpus(VectorSource(data$Body))
+    # Six Preprocess Items
+    corpus <- tm_map(corpus, removePunctuation)
+    corpus <- tm_map(corpus, removeWords, stopwords("english"))
+    corpus <- tm_map(corpus, removeNumbers)
+    corpus <- tm_map(corpus, stripWhitespace)
+    corpus <- tm_map(corpus, tolower)
+    corpus <- tm_map(corpus, stemDocument)
+    data$Body <- as.list(corpus)
+    return(data)
 }
