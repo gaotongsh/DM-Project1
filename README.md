@@ -8,5 +8,6 @@
 - SnowballC
 - plyr
 - wordcloud
+- qdaq
 
 
