@@ -25,7 +25,7 @@ countAndDraw <- function() {
     words_over_100 <- findFreqTerms(dtm, 100)
 
     # find 100 most words
-    ord <- order(word_freq, decreaing=TRUE)
+    ord <- order(word_freq, decreasing=TRUE)
     words_head_100 <- word_freq[ord[1:100]]
 
     # draw word cloud of first 100 words
