@@ -9,9 +9,23 @@ source("preProcessData.R")
 getBagOfWord <- function() {
     data <- getPreprocessedData()
     corpus <- Corpus(VectorSource(data$Body))
-    llply(corpus, bag_o_words)
-    data <- cbind(data, as.list(corpus))
+    # corpus <- llply(corpus, bag_o_words)
+    # get frequency of word in docs
+    bow <- llply(corpus, word_list)
+    # data <- cbind(data, as.list(bow))
     return (data)
+}
+
+simularity <- function(data, dtm) {
+    cos.sim <- function(ix) {
+        A = dtm[ix[1],]
+        B = dtm[ix[2],]
+        return ( sum(A*B) / sqrt(sum(A^2) * sum(B^2)) )
+    }
+    n <- nrow(dtm)
+    cmb <- expand.grid(i=1:n, j=1:n)
+    C <- matrix(apply(cmb, 1, cos.sim), n, n)
+    image(C)
 }
 
 countAndDraw <- function() {
@@ -20,6 +34,7 @@ countAndDraw <- function() {
     # tdm <- TermDocumentMatrix(corpus)
     dtm <- DocumentTermMatrix(corpus)
     word_freq <- colSums(as.matrix(dtm))
+    simularity(data, dtm)
 
     # find words which occur over 100 times
     words_over_100 <- findFreqTerms(dtm, 100)
