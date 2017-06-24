@@ -17,13 +17,16 @@ getDataFrame <- function() {
     return(Data)
 }
 
-parse_xml <-function(FileName) {
+parse_xml <- function(FileName) {
     doc1 <- xmlParse(FileName)
 
     # (1) Find Full_text
     textnodes <- getNodeSet(doc1,"//block[@class='full_text']/p")
     # Excluding the Leading paragraph
-    text <- paste(llply(textnodes[-1], xmlValue), collapse="")
+    if (!is.na(xmlValue(textnodes[[1]])) & substr(xmlValue(textnodes[[1]]), 1, 4) == "LEAD") {
+        textnodes <- textnodes[-1]
+    }
+    text <- paste(llply(textnodes, xmlValue), collapse="")
 
     # (2) Find Date
     yearnode <- getNodeSet(doc1,"//meta[@name='publication_year']")
