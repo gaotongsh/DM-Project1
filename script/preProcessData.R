@@ -45,7 +45,7 @@ parse_xml <-function(FileName) {
     classes <- list(unique(unlist(llply(classes, function(l) l[[1]][3]))))
     if(is.null(classes[[1]])) { classes <- NA }
 
-    doc <- data.frame(Body=text, Date=date)
+    doc <- data.frame(Filename=FileName, Body=text, Date=date)
     doc[["Classifier"]] <- classes
     doc[["Body"]] <- llply(doc[["Body"]], as.character)
     return(doc)
