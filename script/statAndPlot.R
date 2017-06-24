@@ -2,6 +2,7 @@
 # DM Proj1              #
 # 1.3 Bag of Words      #
 # 1.4 Word Cloud        #
+# 1.5 Length Histo      #
 # 1.7 Monthly Distri    #
 # 2.1 Similarity Matrix #
 #########################
@@ -25,7 +26,8 @@ getBagOfWord <- function() {
 }
 
 # 1.4 Plot Word Cloud
-plotWordCloud <- function() {
+# 1.5 Plot Length Distribution
+plotWordPlots <- function() {
     data <- getBagOfWord()
     corpus <- VCorpus(VectorSource(data$Body))
     dtm <- DocumentTermMatrix(corpus)
@@ -40,6 +42,14 @@ plotWordCloud <- function() {
 
     # draw word cloud of first 100 words
     wordcloud(names(words_head_100), words_head_100, colors=brewer.pal(6, 'Dark2'))
+
+    # Length histogram
+    lenlist <- ldply(dtm$dimnames$Term, nchar)
+    ggplot(lenlist, aes(x=V1)) +
+        geom_bar() +
+        xlab("长度") + ylab("频数") +
+        theme_grey(base_family = "SimHei") +
+        geom_text(stat="bin", binwidth=1, aes(label=..count..), vjust=-0.2)
 }
 
 # 1.7 Plot Month
