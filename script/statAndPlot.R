@@ -1,40 +1,33 @@
-#
-#
-#
+#########################
+# DM Proj1              #
+# 1.3 Bag of Words
+# 1.4 Word Cloud        #
+# 2.1 Similarity Matrix #
+#########################
 library(tm)
 library(qdap)
 library(wordcloud)
 source("preProcessData.R")
 
+# 1.3 Construct Bag of Words
 getBagOfWord <- function() {
     data <- getPreprocessedData()
     corpus <- Corpus(VectorSource(data$Body))
-    # corpus <- llply(corpus, bag_o_words)
+
     # get frequency of word in docs
     bow <- llply(corpus, word_list)
-    # data <- cbind(data, as.list(bow))
+    bow <- llply(bow, function(b) b$fwl$all)
+    data[["Bag_o_word"]] <- bow
+
     return (data)
 }
 
-simularity <- function(data, dtm) {
-    cos.sim <- function(ix) {
-        A = dtm[ix[1],]
-        B = dtm[ix[2],]
-        return ( sum(A*B) / sqrt(sum(A^2) * sum(B^2)) )
-    }
-    n <- nrow(dtm)
-    cmb <- expand.grid(i=1:n, j=1:n)
-    C <- matrix(apply(cmb, 1, cos.sim), n, n)
-    image(C)
-}
-
-countAndDraw <- function() {
+# 1.4 Plot Word Cloud
+plotWordCloud <- function() {
     data <- getBagOfWord()
     corpus <- VCorpus(VectorSource(data$Body))
-    # tdm <- TermDocumentMatrix(corpus)
     dtm <- DocumentTermMatrix(corpus)
     word_freq <- colSums(as.matrix(dtm))
-    simularity(data, dtm)
 
     # find words which occur over 100 times
     words_over_100 <- findFreqTerms(dtm, 100)
@@ -45,4 +38,29 @@ countAndDraw <- function() {
 
     # draw word cloud of first 100 words
     wordcloud(names(words_head_100), words_head_100, colors=brewer.pal(6, 'Dark2'))
+}
+
+# 2.1 Compute Similarity
+similarity.bog <- function(data) {
+    cos.sim <- function(ix) {
+        # diag is 1
+        if (ix[1] == ix[2]) return (0.5)
+        # only calculate half of the matrix
+        if (ix[1] > ix[2]) return (0)
+        A = data[[ix[1],"Bag_o_word"]]
+        B = data[[ix[2],"Bag_o_word"]]
+        int_set = intersect(A$WORD, B$WORD)
+        distance = 0
+        llply(int_set, function(i) {
+            distance <<- distance + A[A$WORD==i, "FREQ"]*B[B$WORD==i, "FREQ"]
+            } )
+        return ( distance / sqrt(sum(A$FREQ^2) * sum(B$FREQ^2)) )
+    }
+    n <- nrow(data)
+    cmb <- expand.grid(i=1:n, j=1:n)
+    C <- matrix(apply(cmb, 1, cos.sim), n, n)
+    # c plus its transpose
+    C <- C + t(C)
+    image(c(1:500), c(1:500), C, xlab="", ylab="")
+    return(C)
 }
