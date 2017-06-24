@@ -1,11 +1,13 @@
 #########################
 # DM Proj1              #
-# 1.3 Bag of Words
+# 1.3 Bag of Words      #
 # 1.4 Word Cloud        #
+# 1.7 Monthly Distri    #
 # 2.1 Similarity Matrix #
 #########################
 library(tm)
 library(qdap)
+library(ggplot2)
 library(wordcloud)
 source("preProcessData.R")
 
@@ -38,6 +40,18 @@ plotWordCloud <- function() {
 
     # draw word cloud of first 100 words
     wordcloud(names(words_head_100), words_head_100, colors=brewer.pal(6, 'Dark2'))
+}
+
+# 1.7 Plot Month
+plotMonth <- function(data) {
+    month.chn.name <- c("一月","二月","三月","四月","五月","六月",
+                        "七月","八月","九月","十月","十一月","十二月")
+    tab <- table(factor(months(data$Date), levels=month.chn.name))
+    ggplot(as.data.frame(tab), aes(x=Var1, y=Freq)) +
+        geom_bar(stat="identity") +
+        xlab("月份") + ylab("频数") +
+        theme_grey(base_family = "SimHei") +
+        geom_text(aes(label=Freq), vjust=-0.2)
 }
 
 # 2.1 Compute Similarity
