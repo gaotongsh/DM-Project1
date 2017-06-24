@@ -6,6 +6,7 @@
 # 1.6 Category Histo    #
 # 1.7 Monthly Distri    #
 # 2.1 Similarity Matrix #
+# 2.2 In-cat Similarity #
 #########################
 library(tm)
 library(qdap)
@@ -99,4 +100,30 @@ similarity.bog <- function(data) {
     C <- C + t(C)
     image(c(1:500), c(1:500), C, xlab="", ylab="")
     return(C)
+}
+
+# 2.2 In-category Similarity
+incat.similarity <- function(data, C) {
+    cat <- na.omit(unique(unlist(data$Classifier)))
+
+    # Construct subset mask & Dump article which Body == ""
+    catlist <- llply(cat, function(i)
+        unlist(alply(data, 1, function(j)
+            any(unlist(j[["Classifier"]]) %in% i) & (j[["Body"]] != "")
+        , .expand=FALSE))
+    )
+    listitems <- llply(catlist, function(i) subset(c(1:500), i))
+    # Calculate
+    aveSim <- unlist(llply(listitems, function(i)
+        (sum(C[i, i]) - length(i)) / length(i) / (length(i)-1)
+    ))
+
+    # Plot result
+    result <- data.frame(Cat=cat, Sim=aveSim)
+    result$Cat <- factor(result$Cat, levels = result$Cat[order(result$Sim)])
+    ggplot(result, aes(x=Cat, y=Sim)) +
+        geom_bar(stat="identity") +
+        xlab("Category") + ylab("In-category Similarity") +
+        geom_text(aes(label=sprintf("%0.3f", round(Sim, digits=3))), hjust=1, colour="white") +
+        coord_flip()
 }
