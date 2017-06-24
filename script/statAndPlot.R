@@ -3,6 +3,7 @@
 # 1.3 Bag of Words      #
 # 1.4 Word Cloud        #
 # 1.5 Length Histo      #
+# 1.6 Category Histo    #
 # 1.7 Monthly Distri    #
 # 2.1 Similarity Matrix #
 #########################
@@ -50,6 +51,17 @@ plotWordPlots <- function() {
         xlab("长度") + ylab("频数") +
         theme_grey(base_family = "SimHei") +
         geom_text(stat="bin", binwidth=1, aes(label=..count..), vjust=-0.2)
+}
+
+# 1.6 Plot Category
+plotCategory <- function(data) {
+    catlist <- unlist(data$Classifier)
+    catlist <- sort(table(catlist))
+    ggplot(as.data.frame(catlist), aes(x=catlist, y=Freq)) +
+        geom_bar(stat="identity") +
+        xlab("Category") + ylab("Frequency") +
+        geom_text(aes(label=Freq), hjust=1, colour="white") +
+        coord_flip()
 }
 
 # 1.7 Plot Month
