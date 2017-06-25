@@ -16,8 +16,7 @@ library(wordcloud)
 source("preProcessData.R")
 
 # 1.3 Construct Bag of Words
-getBagOfWord <- function() {
-    data <- getPreprocessedData()
+getBagOfWord <- function(data) {
     corpus <- Corpus(VectorSource(data$Body))
 
     # get frequency of word in docs
@@ -30,8 +29,7 @@ getBagOfWord <- function() {
 
 # 1.4 Plot Word Cloud
 # 1.5 Plot Length Distribution
-plotWordPlots <- function() {
-    data <- getBagOfWord()
+plotWordPlots <- function(data) {
     corpus <- VCorpus(VectorSource(data$Body))
     dtm <- DocumentTermMatrix(corpus)
     word_freq <- colSums(as.matrix(dtm))
@@ -48,22 +46,23 @@ plotWordPlots <- function() {
 
     # Length histogram
     lenlist <- ldply(dtm$dimnames$Term, nchar)
-    ggplot(lenlist, aes(x=V1)) +
+    print(ggplot(lenlist, aes(x=V1)) +
         geom_bar() +
         xlab("长度") + ylab("频数") +
         theme_grey(base_family = "SimHei") +
-        geom_text(stat="bin", binwidth=1, aes(label=..count..), vjust=-0.2)
+        geom_text(stat="bin", binwidth=1, aes(label=..count..), vjust=-0.2))
 }
 
 # 1.6 Plot Category
 plotCategory <- function(data) {
     catlist <- unlist(data$Classifier)
     catlist <- sort(table(catlist))
-    ggplot(as.data.frame(catlist), aes(x=catlist, y=Freq)) +
+    print(ggplot(as.data.frame(catlist), aes(x=catlist, y=Freq)) +
         geom_bar(stat="identity") +
         xlab("Category") + ylab("Frequency") +
         geom_text(aes(label=Freq), hjust=1, colour="white") +
-        coord_flip()
+        coord_flip())
+    return (catlist)
 }
 
 # 1.7 Plot Month
@@ -71,11 +70,12 @@ plotMonth <- function(data) {
     month.chn.name <- c("一月","二月","三月","四月","五月","六月",
                         "七月","八月","九月","十月","十一月","十二月")
     tab <- table(factor(months(data$Date), levels=month.chn.name))
-    ggplot(as.data.frame(tab), aes(x=Var1, y=Freq)) +
+    print(ggplot(as.data.frame(tab), aes(x=Var1, y=Freq)) +
         geom_bar(stat="identity") +
         xlab("月份") + ylab("频数") +
         theme_grey(base_family = "SimHei") +
-        geom_text(aes(label=Freq), vjust=-0.2)
+        geom_text(aes(label=Freq), vjust=-0.2))
+    return (tab)
 }
 
 # 2.1 Compute Similarity
@@ -100,7 +100,7 @@ similarity.bog <- function(data) {
     # c plus its transpose
     C <- C + t(C)
     image(c(1:500), c(1:500), C, xlab="", ylab="")
-    return(C)
+    return (C)
 }
 
 # 2.2 In-category Similarity
@@ -122,11 +122,12 @@ incat.similarity <- function(data, C) {
     # Plot result
     result <- data.frame(Cat=cat, Sim=aveSim)
     result$Cat <- factor(result$Cat, levels = result$Cat[order(result$Sim)])
-    ggplot(result, aes(x=Cat, y=Sim)) +
+    print(ggplot(result, aes(x=Cat, y=Sim)) +
         geom_bar(stat="identity") +
         xlab("Category") + ylab("In-category Similarity") +
         geom_text(aes(label=sprintf("%0.3f", round(Sim, digits=3))), hjust=1, colour="white") +
-        coord_flip()
+        coord_flip())
+    return (result)
 }
 
 # 2.3 Inter-category Similarity

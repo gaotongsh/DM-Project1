@@ -55,8 +55,7 @@ parse_xml <- function(FileName) {
 }
 
 # 1.2 Preprocess with tm
-getPreprocessedData <- function() {
-    data <- getDataFrame()
+getPreprocessedData <- function(data) {
     # To corpus
     corpus <- Corpus(VectorSource(data$Body))
     # Six Preprocess Items
