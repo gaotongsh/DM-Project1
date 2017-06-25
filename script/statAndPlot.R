@@ -7,6 +7,7 @@
 # 1.7 Monthly Distri    #
 # 2.1 Similarity Matrix #
 # 2.2 In-cat Similarity #
+# 2.3 Inter-cat Sim     #
 #########################
 library(tm)
 library(qdap)
@@ -126,4 +127,23 @@ incat.similarity <- function(data, C) {
         xlab("Category") + ylab("In-category Similarity") +
         geom_text(aes(label=sprintf("%0.3f", round(Sim, digits=3))), hjust=1, colour="white") +
         coord_flip()
+}
+
+# 2.3 Inter-category Similarity
+inter.cat.similarity <- function(data, C) {
+    cat <- c("Education", "Theater")
+
+    # Construct subset mask & Dump article which Body == ""
+    catlist <- llply(cat, function(i)
+        unlist(alply(data1.1, 1, function(j)
+            any(unlist(j[["Classifier"]]) %in% i) & (j[["Body"]] != "")
+        , .expand=FALSE))
+    )
+    listitems <- llply(catlist, function(i) subset(c(1:500), i))
+
+    # Get Inter-cat part of the two sets
+    maskedC <- C[setdiff(listitems[[1]], listitems[[2]]),
+                 setdiff(listitems[[2]], listitems[[1]])]
+    # Calculate Average Similarity
+    aveSim <- sum(maskedC) / ncol(maskedC) / nrow(maskedC)
 }
