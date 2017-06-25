@@ -46,5 +46,5 @@ print("...Finished! Result in 'incat.sim'")
 
 print("2.3 Inter-category Similarity...")
 inter.cat.sim <- inter.cat.similarity(data1.3, sim)
-print(paste("...Finished! Average similarity between 'Travel' and 'Theater' is",
+print(paste("...Finished! Average similarity between 'Education' and 'Theater' is",
             inter.cat.sim))
