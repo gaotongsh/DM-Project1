@@ -51,6 +51,8 @@ plotWordPlots <- function(data) {
         xlab("长度") + ylab("频数") +
         theme_grey(base_family = "SimHei") +
         geom_text(stat="bin", binwidth=1, aes(label=..count..), vjust=-0.2))
+
+    return (words_over_100)
 }
 
 # 1.6 Plot Category

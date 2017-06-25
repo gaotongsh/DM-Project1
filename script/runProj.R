@@ -24,8 +24,9 @@ data1.3 <- getBagOfWord(data1.2)
 print("...Finished! Result in 'data1.3'")
 
 print("1.4 Word Cloud & 1.5 Word Length...")
-plotWordPlots(data1.3)
-print("...Finished!")
+words.over.100 <- plotWordPlots(data1.3)
+print("...Finished! Words over 100 includes:")
+print(words.over.100)
 
 print("1.6 Category Histogram...")
 cat.table <- plotCategory(data1.3)
